@@ -19,6 +19,10 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name = "GbRobot", group = "Competition")
 public class GbRobot extends LinearOpMode {
 
+    // ===== מהירות מקסימלית (בין 0 ל-1). 1.0 = מהירות מלאה, 0.5 = חצי מהירות =====
+    static final double MAX_FORWARD_SPEED = 0.7;    // מקסימום בנסיעה קדימה
+    static final double MAX_BACKWARD_SPEED = 0.7;   // מקסימום בנסיעה אחורה
+
     // false = המנוע מסתובב קדימה כשנותנים לו כוח חיובי.
     // אם גלגל נוסע אחורה כשלוחצים R2, משנים אותו ל-true.
     static final boolean LEFT_REVERSED = false;
@@ -54,6 +58,13 @@ public class GbRobot extends LinearOpMode {
             double power = -gamepad1.right_stick_y;
             if (Math.abs(power) < 0.05) power = 0;   // התעלמות מרעידות קטנות
             power = Range.clip(power, -1.0, 1.0);
+
+            // הגבלת מהירות מקסימלית: דחיפה מלאה של הג'ויסטיק נותנת בדיוק את המקסימום שהגדרת.
+            if (power > 0) {
+                power *= MAX_FORWARD_SPEED;      // קדימה
+            } else {
+                power *= MAX_BACKWARD_SPEED;     // אחורה
+            }
 
             // שלב 3: הג'ויסטיק השמאלי (ציר X) לפנייה. ימינה = ערך חיובי, שמאלה = שלילי.
             double turn = gamepad1.left_stick_x;
