@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.util.Range;
  *
  *   ג'ויסטיק ימין, למעלה - נוסע קדימה (ככל שדוחפים יותר, מהר יותר)
  *   ג'ויסטיק ימין, למטה  - נוסע אחורה
+ *   ג'ויסטיק שמאל, ימינה - פונה ימינה
+ *   ג'ויסטיק שמאל, שמאלה - פונה שמאלה
  *
  * חומרה (Configure Robot): מנועים בשמות "left" ו-"right" (בדיוק כך, אותיות קטנות).
  */
@@ -53,13 +55,30 @@ public class GbRobot extends LinearOpMode {
             if (Math.abs(power) < 0.05) power = 0;   // התעלמות מרעידות קטנות
             power = Range.clip(power, -1.0, 1.0);
 
-            // שלב 3: שני המנועים מקבלים אותו כוח, ולכן הרובוט נוסע ישר
-            leftDrive.setPower(power);
-            rightDrive.setPower(power);
+            // שלב 3: הג'ויסטיק השמאלי (ציר X) לפנייה. ימינה = ערך חיובי, שמאלה = שלילי.
+            double turn = gamepad1.left_stick_x;
+            if (Math.abs(turn) < 0.05) turn = 0;     // התעלמות מרעידות קטנות
+
+            // שלב 4: חישוב כוח לכל צד.
+            // נסיעה קדימה מפעילה את שני הצדדים באותו כיוון.
+            // פנייה ימינה: שמאל מקדימה וימין לאחור. פנייה שמאלה: להפך.
+            double left = power + turn;
+            double right = power - turn;
+
+            // שלב 5: אם הסכום עולה על 1, מקטינים את שניהם באותו יחס כדי לשמור על הכיוון
+            double max = Math.max(Math.abs(left), Math.abs(right));
+            if (max > 1.0) {
+                left /= max;
+                right /= max;
+            }
+
+            leftDrive.setPower(left);
+            rightDrive.setPower(right);
 
             // שלב 4: מידע בתחנת הנהג (עוזר לבדוק שהשלט עובד)
             telemetry.addData("ג'ויסטיק ימין (Y)", "%.2f", gamepad1.right_stick_y);
-            telemetry.addData("כוח למנועים", "%.2f", power);
+            telemetry.addData("ג'ויסטיק שמאל (X)", "%.2f", gamepad1.left_stick_x);
+            telemetry.addData("Left / Right power", "%.2f / %.2f", left, right);
             telemetry.update();
         }
 
