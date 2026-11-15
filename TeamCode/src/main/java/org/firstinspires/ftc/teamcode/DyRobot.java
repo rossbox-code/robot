@@ -16,8 +16,8 @@ import com.qualcomm.robotcore.util.Range;
  *
  * חומרה (Configure Robot): מנועים בשמות "left" ו-"right" (בדיוק כך, אותיות קטנות).
  */
-@TeleOp(name = "GbRobot", group = "Competition")
-public class GbRobot extends LinearOpMode {
+@TeleOp(name = "DyRobot", group = "Competition")
+public class DyRobot extends LinearOpMode {
 
     // ===== מהירות מקסימלית בנהיגה רגילה (בין 0 ל-1) =====
     static final double MAX_FORWARD_SPEED = 0.7;    // מקסימום בנסיעה קדימה
