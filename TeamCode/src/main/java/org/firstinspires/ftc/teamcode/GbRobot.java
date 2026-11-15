@@ -17,6 +17,11 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name = "GbRobot", group = "Competition")
 public class GbRobot extends LinearOpMode {
 
+    // false = המנוע מסתובב קדימה כשנותנים לו כוח חיובי.
+    // אם גלגל נוסע אחורה כשלוחצים R2, משנים אותו ל-true.
+    static final boolean LEFT_REVERSED = false;
+    static final boolean RIGHT_REVERSED = false;
+
     private DcMotor leftDrive, rightDrive;
 
     @Override
@@ -25,10 +30,12 @@ public class GbRobot extends LinearOpMode {
         leftDrive = hardwareMap.get(DcMotor.class, "left");
         rightDrive = hardwareMap.get(DcMotor.class, "right");
 
-        // מנוע אחד הפוך כי הם פונים לכיוונים הפוכים.
-        // אם הרובוט נוסע אחורה כשלוחצים R2 - מחליפים FORWARD/REVERSE בשני המנועים.
-        leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        // שני המנועים באותו כיוון: R2 מפעיל את שניהם קדימה, L2 את שניהם אחורה.
+        // אם גלגל מסוים מסתובב הפוך, משנים את המתג שלו (LEFT_REVERSED / RIGHT_REVERSED) בראש הקוד.
+        leftDrive.setDirection(LEFT_REVERSED
+                ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD);
+        rightDrive.setDirection(RIGHT_REVERSED
+                ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD);
 
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
