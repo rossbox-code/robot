@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.util.Range;
 /**
  * נסיעה קדימה ואחורה בלבד:
  *
- *   R2 (לחיצה) - נוסע קדימה. ככל שלוחצים חזק יותר, מהר יותר
- *   L2 (לחיצה) - נוסע אחורה. ככל שלוחצים חזק יותר, מהר יותר
+ *   ג'ויסטיק ימין, למעלה - נוסע קדימה (ככל שדוחפים יותר, מהר יותר)
+ *   ג'ויסטיק ימין, למטה  - נוסע אחורה
  *
  * חומרה (Configure Robot): מנועים בשמות "left" ו-"right" (בדיוק כך, אותיות קטנות).
  */
@@ -20,7 +20,7 @@ public class GbRobot extends LinearOpMode {
     // false = המנוע מסתובב קדימה כשנותנים לו כוח חיובי.
     // אם גלגל נוסע אחורה כשלוחצים R2, משנים אותו ל-true.
     static final boolean LEFT_REVERSED = false;
-    static final boolean RIGHT_REVERSED = false;
+    static final boolean RIGHT_REVERSED = true;   // הרובוט הסתובב במקום, לכן הימני הפוך
 
     private DcMotor leftDrive, rightDrive;
 
@@ -47,9 +47,10 @@ public class GbRobot extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            // שלב 2: R2 הוא right_trigger ו-L2 הוא left_trigger, שניהם ערך בין 0 ל-1.
-            // קדימה פחות אחורה: אם לוחצים על שניהם הם מבטלים אחד את השני.
-            double power = gamepad1.right_trigger - gamepad1.left_trigger;
+            // שלב 2: הג'ויסטיק הימני. ב-FTC דחיפה למעלה נותנת ערך שלילי, לכן הופכים סימן.
+            // למעלה = קדימה, למטה = אחורה.
+            double power = -gamepad1.right_stick_y;
+            if (Math.abs(power) < 0.05) power = 0;   // התעלמות מרעידות קטנות
             power = Range.clip(power, -1.0, 1.0);
 
             // שלב 3: שני המנועים מקבלים אותו כוח, ולכן הרובוט נוסע ישר
@@ -57,8 +58,7 @@ public class GbRobot extends LinearOpMode {
             rightDrive.setPower(power);
 
             // שלב 4: מידע בתחנת הנהג (עוזר לבדוק שהשלט עובד)
-            telemetry.addData("R2 (קדימה)", "%.2f", gamepad1.right_trigger);
-            telemetry.addData("L2 (אחורה)", "%.2f", gamepad1.left_trigger);
+            telemetry.addData("ג'ויסטיק ימין (Y)", "%.2f", gamepad1.right_stick_y);
             telemetry.addData("כוח למנועים", "%.2f", power);
             telemetry.update();
         }
