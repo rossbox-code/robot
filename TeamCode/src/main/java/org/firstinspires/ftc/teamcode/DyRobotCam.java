@@ -190,7 +190,8 @@ public class DyRobotCam extends LinearOpMode {
         List<AprilTagDetection> detections = aprilTag.getDetections();
         AprilTagDetection closest = null;
         for (AprilTagDetection d : detections) {
-            if (d.ftcPose == null || !isTargetId(d.id)) continue;
+            // metadata קיים רק לתגים שנמצאים בספרייה שבנינו (30 עד 37), כך שכל תג אחר מדולג
+            if (d.metadata == null || d.ftcPose == null) continue;
             if (closest == null || d.ftcPose.range < closest.ftcPose.range) {
                 closest = d;
             }
@@ -198,19 +199,12 @@ public class DyRobotCam extends LinearOpMode {
         return closest;
     }
 
-    private boolean isTargetId(int id) {
-        for (int target : TARGET_IDS) {
-            if (target == id) return true;
-        }
-        return false;
-    }
-
     private void addTagTelemetry(AprilTagDetection tag) {
         if (tag == null) {
             telemetry.addData("תג", "לא נראה");
             return;
         }
-        telemetry.addData("תג ID", tag.id);
+        telemetry.addData("תג", tag.metadata.name);   // השם שנתנו בספרייה: "Tag 30" וכו'
         telemetry.addData("מרחק (אינץ')", "%.1f", tag.ftcPose.range);
         telemetry.addData("זווית bearing (מעלות)", "%.1f", tag.ftcPose.bearing);
         telemetry.addData("yaw (מעלות)", "%.1f", tag.ftcPose.yaw);
